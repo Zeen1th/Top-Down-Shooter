@@ -1,32 +1,41 @@
-# Top-Down Shooter Game
+# Top-Down Shooter – CI Workflow
 
-## GitHub Actions Workflow
+This Unity project uses GitHub Actions to automatically build the game for multiple platforms when changes are pushed to the repository.
 
-We use GitHub Actions to automatically build our Unity project for Windows when pushing to the `main` branch or creating a pull request.
+## 🔧 CI Workflow Overview
 
-### How It Works:
-- The workflow is triggered on any push or PR to `main`.
-- It sets up Unity using the `game-ci` GitHub Actions.
-- Builds the game for Windows (64-bit).
-- Uploads the build as an artifact for download.
+The workflow is defined in `.github/workflows/unity.yml`. It runs automatically on every `push`.
 
-You can find the build artifacts and logs in the **Actions** tab.
+### 🔁 What it does:
+- **Builds the game for each supported platform:**
+  - `StandaloneWindows64` (Windows)
+  - `WebGL` (Web)
+- **Caches the Unity `Library` folder** to speed up future builds.
+- **Uses Unity Builder (game-ci)** to handle project builds.
+- **Uploads each build as an artifact** so you can download and test it.
+
+### 📁 Artifacts:
+After each build, the result is available in the GitHub Actions tab under your workflow run. You’ll find downloadable builds for each platform.
+
+## 🔐 Secrets Required
+
+Make sure you have the following GitHub secrets set in your repo:
+
+- `UNITY_LICENSE` – Your Unity license in text or base64 format.
+- `UNITY_EMAIL` – Your Unity login email.
+- `UNITY_PASSWORD` – Your Unity password or app password (if using 2FA).
+
+Add them under **Settings > Secrets and variables > Actions**.
+
+## 🛠️ Branching Strategy
+
+We use a simple strategy:
+
+- **`main`**: Stable builds. Only push or merge tested features here.
+- **Feature branches**: Create branches like `feature/new-weapon` or `bugfix/enemy-ai` for each change or fix. Merge to `main` through pull requests after testing.
+
+This keeps the main branch clean and ensures all builds passing before merging.
 
 ---
 
-## Branching Strategy
-
-We use the **Git Flow** approach:
-
-- `main`: stable and production-ready.
-- `dev`: development branch where new features are merged.
-- `feature/feature-name`: individual branches for each new feature or task.
-- `bugfix/bug-description`: for fixing issues.
-
-### How to Contribute:
-1. Branch out from `dev`.
-2. Create a `feature/` or `bugfix/` branch.
-3. Make changes and push.
-4. Create a pull request into `dev`.
-5. After testing, merge `dev` into `main`.
-
+If you’re part of the team, always pull the latest `main` before starting new work and make sure your changes don’t break the build.
