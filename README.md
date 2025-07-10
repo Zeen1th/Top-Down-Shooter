@@ -1,10 +1,10 @@
-# Top-Down Shooter – CI Workflow
+# Top-Down Shooter - CI Workflow
 
 This Unity project uses GitHub Actions to automatically build the game for multiple platforms when changes are pushed to the repository.
 
 ## 🔧 CI Workflow Overview
 
-The workflow is defined in `.github/workflows/unity.yml`. It runs automatically on every `push`.
+The workflow is defined in `.github/workflows/unity.yml`. It runs automatically on every push.
 
 ### 🔁 What it does:
 - **Builds the game for each supported platform:**
@@ -12,6 +12,7 @@ The workflow is defined in `.github/workflows/unity.yml`. It runs automatically 
   - `WebGL` (Web)
 - **Caches the Unity `Library` folder** to speed up future builds.
 - **Uses Unity Builder (game-ci)** to handle project builds.
+- **Runs a Unity build using `BuildScript.PerformBuild()`**, located in `Assets/Editor/BuildScript.cs`.
 - **Uploads each build as an artifact** so you can download and test it.
 
 ### 📁 Artifacts:
@@ -21,21 +22,24 @@ After each build, the result is available in the GitHub Actions tab under your w
 
 Make sure you have the following GitHub secrets set in your repo:
 
-- `UNITY_LICENSE` – Your Unity license in text or base64 format.
+- `UNITY_LICENSE` – Your Unity license (text or base64 format).
 - `UNITY_EMAIL` – Your Unity login email.
 - `UNITY_PASSWORD` – Your Unity password or app password (if using 2FA).
 
-Add them under **Settings > Secrets and variables > Actions**.
+Add these under **Settings > Secrets and variables > Actions** in your GitHub repo.
 
-## 🛠️ Branching Strategy
+## 🔀 Branching Strategy
 
-We use a simple strategy:
+We use a simple and clean strategy:
 
-- **`main`**: Stable builds. Only push or merge tested features here.
-- **Feature branches**: Create branches like `feature/new-weapon` or `bugfix/enemy-ai` for each change or fix. Merge to `main` through pull requests after testing.
+- **`main`**: Stable builds only. Push or merge here only after testing.
+- **Feature branches**: Use branches like `feature/powerups` or `bugfix/enemy-ai` for development. Merge to `main` through pull requests with reviews if working as a team.
 
-This keeps the main branch clean and ensures all builds passing before merging.
+This keeps the main branch safe and ensures CI builds pass before merging.
 
----
+## ▶️ Running the Build Locally
 
-If you’re part of the team, always pull the latest `main` before starting new work and make sure your changes don’t break the build.
+To build the project from the command line:
+
+```bash
+unity -quit -batchmode -projectPath . -executeMethod BuildScript.PerformBuild
