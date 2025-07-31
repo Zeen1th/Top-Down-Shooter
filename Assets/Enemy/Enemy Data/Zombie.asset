@@ -16,4 +16,9 @@ MonoBehaviour:
   moveSpeed: 3
   health: 100
   damage: 5
-  prefab: {fileID: 2853538533530799251, guid: f5a20fb1a10e77742b25924af3fd1860, type: 3}
+  prefab:
+    m_AssetGUID: f5a20fb1a10e77742b25924af3fd1860
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_SubObjectGUID: 
+    m_EditorAssetChanged: 0

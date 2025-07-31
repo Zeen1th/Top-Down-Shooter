@@ -1,13 +1,15 @@
+// EnemyAI.cs
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
     public EnemyData enemyData;
+    public Transform Player { get; private set; }
+    public float MoveSpeed { get; private set; }
+    public Rigidbody Rigidbody { get; private set; }
 
-    private Transform player;
-    private float moveSpeed;
     private int health;
-    private Rigidbody rb;
+    private IEnemyState currentState;
 
     [Header("Power Up Drops")]
     [SerializeField] private GameObject fireRatePowerUpPrefab;
@@ -22,27 +24,17 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        moveSpeed = enemyData.moveSpeed;
+        Player = GameObject.FindGameObjectWithTag("Player").transform;
+        MoveSpeed = enemyData.moveSpeed;
         health = enemyData.health;
+        Rigidbody = GetComponent<Rigidbody>();
 
-        rb = GetComponent<Rigidbody>();
+        SetState(new ChaseState());
     }
 
     void FixedUpdate()
     {
-        if (player == null) return;
-
-        Vector3 direction = (player.position - transform.position).normalized;
-        direction.y = 0f;
-
-        rb.linearVelocity = direction * moveSpeed;
-
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, lookRotation, Time.fixedDeltaTime * 5f));
-        }
+        currentState?.UpdateState(this);
     }
 
     public void TakeDamage(int amount)
@@ -50,12 +42,11 @@ public class EnemyAI : MonoBehaviour
         health -= amount;
         if (health <= 0)
         {
-            DropPowerUp();
-            Destroy(gameObject);
+            SetState(new DeadState());
         }
     }
 
-    private void DropPowerUp()
+    public void DropPowerUp()
     {
         if (Random.value > dropChance) return;
 
@@ -64,6 +55,12 @@ public class EnemyAI : MonoBehaviour
         {
             Instantiate(drop, transform.position + Vector3.up * 1.5f, Quaternion.identity);
         }
+    }
+
+    public void SetState(IEnemyState newState)
+    {
+        currentState = newState;
+        currentState.EnterState(this);
     }
 
     private void OnCollisionEnter(Collision collision)

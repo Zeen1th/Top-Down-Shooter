@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -81,12 +83,23 @@ public class EnemySpawner : MonoBehaviour
         spawnPosition.y = playerTransform.position.y;
 
         EnemyData data = enemyTypes[Random.Range(0, enemyTypes.Count)];
-        GameObject newEnemy = Instantiate(data.prefab, spawnPosition, Quaternion.identity);
 
-        EnemyAI ai = newEnemy.GetComponent<EnemyAI>();
-        if (ai != null) ai.enemyData = data;
+        // Load and instantiate the prefab from Addressables
+        data.prefab.InstantiateAsync(spawnPosition, Quaternion.identity).Completed += handle =>
+        {
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                GameObject newEnemy = handle.Result;
+                EnemyAI ai = newEnemy.GetComponent<EnemyAI>();
+                if (ai != null) ai.enemyData = data;
 
-        spawnedEnemies.Add(newEnemy);
+                spawnedEnemies.Add(newEnemy);
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to spawn enemy: {data.enemyName}");
+            }
+        };
     }
 
     private Vector3 FlattenY(Vector3 v) => new Vector3(v.x, -2.0f, v.z);

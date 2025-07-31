@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 [CreateAssetMenu(fileName = "EnemyData", menuName = "Game/Enemy Data")]
 public class EnemyData : ScriptableObject
@@ -7,5 +8,7 @@ public class EnemyData : ScriptableObject
     public float moveSpeed;
     public int health;
     public int damage;
-    public GameObject prefab;
+
+    [Header("Addressable Prefab")]
+    public AssetReferenceGameObject prefab;
 }
